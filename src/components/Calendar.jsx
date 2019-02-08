@@ -141,6 +141,7 @@ export default class Calendar extends Component {
 
   render(){
     return (
+      <div>
       <Switch>
         <Route exact path='/Day' render={() => {
           return <Day day={this.state.currentDay}/>
@@ -153,6 +154,7 @@ export default class Calendar extends Component {
             {this.renderCells()}
           </div>
       </Switch>
+    </div>
     )
   }
 }

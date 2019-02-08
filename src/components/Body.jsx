@@ -1,32 +1,50 @@
 import React, { Component } from 'react'
-import { Button, Modal } from 'semantic-ui-react'
+import { Button, Modal, size } from 'semantic-ui-react'
 
 class ModalExampleSize extends Component {
-  state = { open: false }
 
-  show = size => () => this.setState({ size, open: true })
-  close = () => this.setState({ open: false })
+  show = size => () => this.setState({ size })
 
   render() {
-    const { open, size } = this.state
-
     return (
       <div>
-        <Button onClick={this.show('tiny')}>{this.props.title}</Button>
+        {this.props.entireNote.map(note => {
+          return (<Modal size={'small'} trigger={<Button onClick={this.show('tiny')}>{note.title}</Button>}>
+              <Modal.Header>Your Event Is...</Modal.Header>
+              <Modal.Content>
+                <p>{note.note}</p>
+              </Modal.Content>
+              <Modal.Actions>
+                <Button negative>No</Button>
+                <Button positive icon='checkmark' labelPosition='right' content='Yes' />
+              </Modal.Actions>
+            </Modal>)
+        })}
 
-        <Modal size={size} open={open} onClose={this.close}>
-          <Modal.Header>Delete Your Account</Modal.Header>
-          <Modal.Content>
-            <p>{this.props.body}</p>
-          </Modal.Content>
-          <Modal.Actions>
-            <Button negative onClick={() => this.props.popUpBody(this.props.body)}>No</Button>
-            <Button positive icon='checkmark' labelPosition='right' content='Yes' />
-          </Modal.Actions>
-        </Modal>
       </div>
     )
   }
 }
 
 export default ModalExampleSize
+
+
+
+
+// <div>
+//     if(this.props.title){
+//       this.props.title.map((title, i)=> <Button key={title, i} onClick={this.show('tiny')}>{title}</Button>)
+//     }
+//     <Modal size={size} open={open} onClose={this.close}>
+//       <Modal.Header>Your Event Is...</Modal.Header>
+//       <Modal.Content>
+//         if (this.props.body){
+//           this.props.body.map(body => <p>{body}</p>)
+//         }
+//       </Modal.Content>
+//       <Modal.Actions>
+//         <Button negative>No</Button>
+//         <Button positive icon='checkmark' labelPosition='right' content='Yes' />
+//       </Modal.Actions>
+//     </Modal>
+// </div>

@@ -9,21 +9,44 @@ let monthDayYear = 'dddd MMMM Do YYYY';
 
 export default class Day extends Component {
 
-    state = {
-       title: '',
-       note: '',
-       hour: '',
-       day: this.props.day,
-       user_id: 2
+  constructor(props) {
+    super(props)
+    let dayHour = 'h:mma'
+    let currentHour = this.props.day;
+    let startDate = currentHour.setHours(0,0,0,0)
+    let hours = {}
+    for(var i = 0; i < 24; i++){
+      hours[dateFns.format(dateFns.addHours(startDate, i), dayHour)] = { notes: []}
+    }
+    this.state = {
+      completeNote: [],
+      hours,
+      obj: []
+    }
+  }
+
+
+    componentDidMount() {
+      let hours = { ...this.state.hours }
+      fetch('http://localhost:3001/api/v1/events')
+      .then(res => res.json())
+      .then(data => {
+        // Go into data
+        // Filter based upon the day we are looking (aka this.props.day)
+        // You must convert them to date objects and getDay()
+        data.forEach(note => {
+          if (note.hour) {
+            hours[note.hour].notes.push(note)
+          }
+        })
+        this.setState({
+           hours,
+           completeNote: data
+         })
+      })
     }
 
-    handleInput = (e, title, note, hour) => {
-      e.preventDefault()
-      this.setState({
-        title,
-        note,
-        hour
-      }, () => {
+    handleInput = (obj) => {
         fetch('http://localhost:3001/api/v1/events', {
           method: 'POST',
           headers: {
@@ -31,21 +54,28 @@ export default class Day extends Component {
             'Content-Type': 'application/json',
           },
             body: JSON.stringify({
-            title: this.state.title,
-            note: this.state.note,
-            hour: this.state.hour,
-            day: this.state.day,
-            user_id: this.state.user_id
+            title: obj.title,
+            note: obj.note,
+            hour: obj.hour,
+            day: this.props.day,
+            user_id: 2
           })
         })
         .then(res => res.json())
-        .then(console.log)
-      })
-    }
+        .then(data => {
+          let hours = { ...this.state.hours }
+            if (data.hour) {
+              hours[data.hour].notes.push(data)
+            }
+          this.setState({
+             hours,
+             completeNote: data
+           })
+        })
+      }
 
-    popUpBody = (e) => {
-      console.log(e);
-    }
+    // popUpBody = (obj) => {
+    // }
 
   hours = () => {
     let dayHour = 'h:mma'
@@ -56,20 +86,19 @@ export default class Day extends Component {
       hour.push(dateFns.format(dateFns.addHours(startDate, i), dayHour))
     }
     return hour.map(hour => {
-      return <ul key={hour}>
-          <li>{hour}</li>
-          <ul className='hourRow'><li onClick={() => this.state.hour === hour ? console.log(this.state.note) : null}>{this.state.hour === hour ? <Body body={this.state.note} title={this.state.title} popUpBody={this.popUpBody}/> : null}</li></ul>
-          <Note hour={hour} handleInput={this.handleInput} />
-        </ul>
+      return <li
+          className='hourRow' key={hour}>
+          {hour}
+          <Note hour={hour} day={this.props.day} handleInput={this.handleInput} />
+          <Body entireNote={this.state.hours[hour].notes.map(entireNote => entireNote)} popUpBody={this.popUpBody}/>
+          </li>
     })
   }
 
   render() {
-    console.log(this.state.hour.toString());
     let year = gematriya(hebrewDate(this.props.day.getFullYear(), this.props.day.getMonth() + 1, this.props.day.getDate()).year);
     let month = hebrewDate(this.props.day.getFullYear(), this.props.day.getMonth() + 1, this.props.day.getDate()).month_name;
     let day = gematriya(hebrewDate(this.props.day.getFullYear(), this.props.day.getMonth() + 1, this.props.day.getDate()).date).replace("'", "");
-
     return  (
       <div>
         <h1 className='today'>{dateFns.format(this.props.day, monthDayYear)} - {day} {month} {year}</h1>
