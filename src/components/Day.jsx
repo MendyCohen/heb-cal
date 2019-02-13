@@ -15,14 +15,16 @@ export default class Day extends Component {
     let currentHour = this.props.day;
     let startDate = currentHour.setHours(0,0,0,0)
     let hours = {}
+    let hour = []
     for(var i = 0; i < 24; i++){
       hours[dateFns.format(dateFns.addHours(startDate, i), dayHour)] = { notes: []}
+      hour.push(dateFns.format(dateFns.addHours(startDate, i), dayHour))
     }
     this.state = {
-      completeNote: [],
-      hours,
-      obj: []
+      hours
     }
+
+    this.hour = hour
   }
 
 
@@ -31,22 +33,21 @@ export default class Day extends Component {
       fetch('http://localhost:3001/api/v1/events')
       .then(res => res.json())
       .then(data => {
-        // Go into data
-        // Filter based upon the day we are looking (aka this.props.day)
-        // You must convert them to date objects and getDay()
-        data.forEach(note => {
+        let newData;
+        newData = data.filter(note => note.day === new Date(this.props.day).toISOString())
+        newData.forEach(note => {
           if (note.hour) {
             hours[note.hour].notes.push(note)
           }
         })
         this.setState({
-           hours,
-           completeNote: data
+           hours
          })
       })
     }
 
-    handleInput = (obj) => {
+    handleInput = (obj, THIS) => {
+      console.log(obj);
         fetch('http://localhost:3001/api/v1/events', {
           method: 'POST',
           headers: {
@@ -63,35 +64,88 @@ export default class Day extends Component {
         })
         .then(res => res.json())
         .then(data => {
+          console.log(data.id);
           let hours = { ...this.state.hours }
             if (data.hour) {
               hours[data.hour].notes.push(data)
             }
-          this.setState({
-             hours,
-             completeNote: data
-           })
+          this.setState({ hours }, THIS.close);
+        }, THIS.setState({
+          title: '',
+           note: ''
+         })
+        )
+      }
+
+      saveChanges = (obj, id, THIS) => {
+        fetch(`http://localhost:3001/api/v1/events/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+            body: JSON.stringify({
+            note: obj.noteValue
+          })
         })
+        .then(res => res.json())
+        .then(data => {
+          let hours = { ...this.state.hours }
+
+          this.hour.map(hour => hours[hour].notes.filter(hour => hour.id === id)).filter(note => note.length === 1)[0].map(note => note.note = obj.noteValue)
+
+          this.setState({
+            hours: hours
+          })
+        },
+        THIS.close(),
+        THIS.editNote()
+        )
+      }
+
+
+      deleteNote = (id, hour, THIS) => {
+        console.log(id);
+        fetch(`http://localhost:3001/api/v1/events/${id}`, {
+          method: 'DELETE'
+        })
+        .then(res => res.json())
+        .then(obj => {
+          let hours = { ...this.state.hours }
+          let updatedHourNotes = hours[hour].notes.filter(note => note.id !== id);
+          hours[hour].notes = updatedHourNotes
+          this.setState({ hours })
+        }, THIS.close())
       }
 
     // popUpBody = (obj) => {
     // }
 
+    removeEmpty = (obj) => {
+      let THIS = this
+      let hours = { ...this.state.hours }
+      this.hour.map(hour => {
+        Object.keys(this.state.hours[hour]).forEach(key => {
+          if(typeof THIS.state.hours[hour][key] === 'undefined'){
+            delete THIS.state.hours[hour][key];
+          }
+        });
+        return hours[hour]
+      })
+     }
+
   hours = () => {
-    let dayHour = 'h:mma'
-    let currentHour = this.props.day;
-    let startDate = currentHour.setHours(0,0,0,0)
-    let hour = [];
-    for(var i = 0; i < 24; i++){
-      hour.push(dateFns.format(dateFns.addHours(startDate, i), dayHour))
-    }
-    return hour.map(hour => {
-      return <li
-          className='hourRow' key={hour}>
+    //Hours is defined above as a global scope
+    return this.hour.map(hour => {
+      return (
+        <li className='hourRow' key={hour}>
           {hour}
           <Note hour={hour} day={this.props.day} handleInput={this.handleInput} />
-          <Body entireNote={this.state.hours[hour].notes.map(entireNote => entireNote)} popUpBody={this.popUpBody}/>
-          </li>
+          <Body
+            entireNote={this.state.hours[hour].notes ? this.state.hours[hour].notes.map(entireNote => entireNote) : null}
+            popUpBody={this.popUpBody} saveChanges={this.saveChanges}
+            deleteNote={this.deleteNote}/>
+        </li>)
     })
   }
 
@@ -107,3 +161,6 @@ export default class Day extends Component {
     )
   }
 }
+//THIS.setState({
+//  noteValue: ''
+//})

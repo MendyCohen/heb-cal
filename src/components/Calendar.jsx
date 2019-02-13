@@ -20,6 +20,13 @@ export default class Calendar extends Component {
     currentDay: new Date()
   };
 
+  handleOnClick = (cloneDay) => {
+    this.onDateClick(dateFns.parse(cloneDay))
+    this.setState({
+      currentDay: cloneDay
+    })
+  }
+
   renderHeader() {
     const dateFormat = 'MMMM YYYY';
 
@@ -79,24 +86,24 @@ export default class Calendar extends Component {
         formattedDate = dateFns.format(day, dateFormat);
           const cloneDay = day;
           days.push(
-            <div
+            <Link
               className={`col cell ${
                 !dateFns.isSameMonth(day, monthStart)
                 ? "disabled"
                 : dateFns.isSameDay(day, selectedDate) ? "selected" : ""
               }`}
               key={day}
-              onClick={() => this.onDateClick(dateFns.parse(cloneDay), console.log(cloneDay))}
-              onClick={() => this.setState({
-                currentDay: cloneDay
-              })}
-              >
-              <Link to='/Day' className='link'>
-            <span className="number">{formattedDate}</span>
-            <span className='hebNum'>{gematriya(hebrewDate(day.getFullYear(), day.getMonth() + 1, day.getDate()).date).replace("'", "")}</span>
-            <span className="bg">{formattedDate}</span>
+              to={`/Day`}>
+              <div
+                onClick={() => this.handleOnClick(cloneDay)}
+                >
+                <div className='link'>
+                  <span className="number">{formattedDate}</span>
+                  <span className='hebNum'>{gematriya(hebrewDate(day.getFullYear(), day.getMonth() + 1, day.getDate()).date).replace("'", "")}</span>
+                  <span className="bg">{formattedDate}</span>
+                </div>
+              </div>
             </Link>
-        </div>
         );
         day = dateFns.addDays(day, 1);
       }
@@ -158,5 +165,4 @@ export default class Calendar extends Component {
     )
   }
 }
-// <span className="number"><Link to='/Day'>{formattedDate}</Link></span>
 // currentHebMonth: new Hebcal.HDate().toString('h')
