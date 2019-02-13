@@ -40,7 +40,6 @@ export default class Note extends Component {
     return (
       <div>
         {this.props.entireNote.map((note, idx) => {
-          console.log(note.id);
           return (
           <Modal
           dimmer={dimmer}

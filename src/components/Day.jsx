@@ -47,7 +47,6 @@ export default class Day extends Component {
     }
 
     handleInput = (obj, THIS) => {
-      console.log(obj);
         fetch('http://localhost:3001/api/v1/events', {
           method: 'POST',
           headers: {
@@ -64,7 +63,6 @@ export default class Day extends Component {
         })
         .then(res => res.json())
         .then(data => {
-          console.log(data.id);
           let hours = { ...this.state.hours }
             if (data.hour) {
               hours[data.hour].notes.push(data)
@@ -105,7 +103,6 @@ export default class Day extends Component {
 
 
       deleteNote = (id, hour, THIS) => {
-        console.log(id);
         fetch(`http://localhost:3001/api/v1/events/${id}`, {
           method: 'DELETE'
         })
