@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import dateFns from 'date-fns';
-import Note from './Note'
-import Body from './Body'
+import Note from './Note';
+import Body from './Body';
+import Loading from './Loading.jsx';
+
 const hebrewDate = require("hebrew-date");
 const gematriya = require('gematriya');
 
@@ -21,7 +23,8 @@ export default class Day extends Component {
       hour.push(dateFns.format(dateFns.addHours(startDate, i), dayHour))
     }
     this.state = {
-      hours
+      hours,
+      loading: true
     }
 
     this.hour = hour
@@ -41,7 +44,8 @@ export default class Day extends Component {
           }
         })
         this.setState({
-           hours
+           hours,
+           loading: false
          })
       })
     }
@@ -153,11 +157,10 @@ export default class Day extends Component {
     return  (
       <div>
         <h1 className='today'>{dateFns.format(this.props.day, monthDayYear)} - {day} {month} {year}</h1>
+        <h2>{this.state.loading && <span className='loading'>Loading Notes <Loading /></span>}</h2>
         {this.hours()}
       </div>
     )
   }
 }
-//THIS.setState({
-//  noteValue: ''
-//})
+//style={{display: 'inline'}}
