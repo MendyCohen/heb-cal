@@ -3,6 +3,7 @@ import dateFns from 'date-fns';
 import Note from './Note';
 import Body from './Body';
 import Loading from './Loading.jsx';
+//import CurrentHour from './CurrentHour';
 
 const hebrewDate = require("hebrew-date");
 const gematriya = require('gematriya');
@@ -33,12 +34,10 @@ export default class Day extends Component {
 
     componentDidMount() {
       let hours = { ...this.state.hours }
-      fetch('http://localhost:3001/api/v1/events')
+      fetch(`http://localhost:3001/api/v1/events/${dateFns.format(this.props.day, 'D, M, YYYY')}`)
       .then(res => res.json())
       .then(data => {
-        let newData;
-        newData = data.filter(note => note.day === new Date(this.props.day).toISOString())
-        newData.forEach(note => {
+          data.forEach(note => {
           if (note.hour) {
             hours[note.hour].notes.push(note)
           }
@@ -83,18 +82,20 @@ export default class Day extends Component {
         fetch(`http://localhost:3001/api/v1/events/${id}`, {
           method: 'PATCH',
           headers: {
-            'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Accept': 'application/json'
           },
             body: JSON.stringify({
-            note: obj.noteValue
+              title: obj.noteTitle,
+              note: obj.noteValue
           })
         })
         .then(res => res.json())
         .then(data => {
           let hours = { ...this.state.hours }
 
-          this.hour.map(hour => hours[hour].notes.filter(hour => hour.id === id)).filter(note => note.length === 1)[0].map(note => note.note = obj.noteValue)
+          this.hour.map(hour => hours[hour].notes.filter(hour => hour.id === id)).filter(note => note.length === 1)[0].map(note => note.title = data.title)
+          this.hour.map(hour => hours[hour].notes.filter(hour => hour.id === id)).filter(note => note.length === 1)[0].map(note => note.note = data.note)
 
           this.setState({
             hours: hours
@@ -137,9 +138,20 @@ export default class Day extends Component {
 
   hours = () => {
     //Hours is defined above as a global scope
+    let hourFormat = 'h:00a'
+    let theCurrentHour = dateFns.format(new Date(), hourFormat)
     return this.hour.map(hour => {
       return (
-        <li className='hourRow' key={hour}>
+        <li  className={theCurrentHour === hour
+            && this.props.day.getDate() === new Date().getDate()
+            && this.props.day.getMonth() === new Date().getMonth()
+            && this.props.day.getYear() === new Date().getYear()
+            ?
+            'hourRowBlue'
+            :
+            'hourRow'}
+            key={hour}
+            >
           {hour}
           <Note hour={hour} day={this.props.day} handleInput={this.handleInput} />
           <Body
@@ -163,4 +175,5 @@ export default class Day extends Component {
     )
   }
 }
-//style={{display: 'inline'}}
+//<CurrentHour />
+//className='hourRowBlue'

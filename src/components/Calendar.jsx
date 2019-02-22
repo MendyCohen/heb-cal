@@ -20,6 +20,10 @@ export default class Calendar extends Component {
     currentDay: new Date()
   };
 
+  // todayHighlight = () => {
+  //   {new Date() ? }
+  // }
+
   handleOnClick = (cloneDay) => {
     this.onDateClick(dateFns.parse(cloneDay))
     this.setState({
@@ -70,6 +74,8 @@ export default class Calendar extends Component {
   }
 
   renderCells() {
+    let formating = 'MM/DD/YYYY';
+
     const { currentMonth, selectedDate } = this.state;
     const monthStart = dateFns.startOfMonth(currentMonth);
     const monthEnd = dateFns.endOfMonth(monthStart);
@@ -93,14 +99,16 @@ export default class Calendar extends Component {
                 : dateFns.isSameDay(day, selectedDate) ? "selected" : ""
               }`}
               key={day}
-              to={`/Day`}>
+              to={`/Day`}
+              >
               <div
                 onClick={() => this.handleOnClick(cloneDay)}
                 >
-                <div className='link'>
+                <div className={dateFns.format(new Date(), formating) === dateFns.format(day, formating) ? 'link highlightedDate' : 'link'}>
                   <span className="number">{formattedDate}</span>
                   <span className='hebNum'>{gematriya(hebrewDate(day.getFullYear(), day.getMonth() + 1, day.getDate()).date).replace("'", "")}</span>
-                  <span className="bg">{formattedDate}</span>
+                  <span className='bg'>{formattedDate}</span>
+                  <span className='highlightedDate'>{<br></br>}{<br></br>}{<br></br>}{<br></br>}</span>
                 </div>
               </div>
             </Link>
@@ -108,7 +116,7 @@ export default class Calendar extends Component {
         day = dateFns.addDays(day, 1);
       }
         rows.push(
-          <div className="row" key={day}>
+          <div className='row' key={day}>
           {days}
         </div>
       );
@@ -147,8 +155,12 @@ export default class Calendar extends Component {
   }
 
   render(){
+    let formating = 'MM/DD/YYYY'
+    console.log(dateFns.format(new Date(), formating) === dateFns.format(this.state.currentMonth, formating));
+    console.log(new Date().getDate());
+    console.log(dateFns.format(this.state.currentMonth, formating));
     return (
-      <div>
+     <div>
       <Switch>
         <Route exact path='/Day' render={() => {
           return <Day day={this.state.currentDay}/>
@@ -161,7 +173,7 @@ export default class Calendar extends Component {
             {this.renderCells()}
           </div>
       </Switch>
-    </div>
+     </div>
     )
   }
 }

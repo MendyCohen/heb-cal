@@ -6,6 +6,7 @@ export default class Note extends Component {
   state = {
     open: false,
     noteValue: "",
+    noteTitle: "",
     editNote: false,
     editClicked: false,
     noteId: ''
@@ -31,7 +32,7 @@ export default class Note extends Component {
    }
 
   show = (dimmer, note) => () => {
-    this.setState({ dimmer, open: true, noteValue: note.note, noteId: note.id })
+    this.setState({ dimmer, open: true, noteValue: note.note, noteTitle: note.title, noteId: note.id })
   }
   close = () => this.setState({ open: false })
 
@@ -54,14 +55,26 @@ export default class Note extends Component {
             <p>
               {
                 this.state.editNote ?
-                  <form id={note.id}>
+                  <form id={note.id} onSubmit={(e) => e.preventDefault()}>
+
                     <label>
+                      Title{'   '}
+                      <input
+                        type='text'
+                        onChange={(e) => this.handleChange(e)}
+                        name='noteTitle'
+                        value={this.state.noteTitle}/>
+                    </label><br></br>
+
+                    <label>
+                      Note{'   '}
                       <input
                         type='text'
                         onChange={(e) => this.handleChange(e)}
                         name='noteValue'
                         value={this.state.noteValue}/>
                     </label>
+
                   </form> :
                   this.state.noteValue
               }

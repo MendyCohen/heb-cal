@@ -42,7 +42,8 @@ export default class Note extends Component {
               onClick={this.show(true)}
               size='small'
               name='edit'
-              className='icon' / >
+              className={this.props.hour.length === 6 ? 'iconExtraPadding' : 'icon'}
+               / >
           }>
           <Modal.Content image>
             <Image wrapped size='medium' src='https://react.semantic-ui.com/images/avatar/large/rachel.png' />
