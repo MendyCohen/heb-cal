@@ -31,7 +31,6 @@ export default class Day extends Component {
     this.hour = hour
   }
 
-
     componentDidMount() {
       let hours = { ...this.state.hours }
       fetch(`http://localhost:3001/api/v1/events/${dateFns.format(this.props.day, 'D, M, YYYY')}`)
@@ -143,14 +142,16 @@ export default class Day extends Component {
     return this.hour.map(hour => {
       return (
         <li  className={theCurrentHour === hour
-            && this.props.day.getDate() === new Date().getDate()
-            && this.props.day.getMonth() === new Date().getMonth()
-            && this.props.day.getYear() === new Date().getYear()
-            ?
-            'hourRowBlue'
-            :
-            'hourRow'}
+          && this.props.day.getDate() === new Date().getDate()
+          && this.props.day.getMonth() === new Date().getMonth()
+          && this.props.day.getYear() === new Date().getYear()
+          ?
+          'hourRowBlue'
+          :
+          'hourRow'
+        }
             key={hour}
+            id={'' + hour + ' ' + this.props.day.getMonth() + '/' + this.props.day.getDate() + '/' + this.props.day.getYear()}
             >
           {hour}
           <Note hour={hour} day={this.props.day} handleInput={this.handleInput} />
@@ -162,12 +163,37 @@ export default class Day extends Component {
     })
   }
 
+  reNew = (hourClickedOn) => {
+    if (
+      window.document.location.href === 'http://localhost:3000/Day'
+      && hourClickedOn.getDate() === new Date().getDate()
+      && hourClickedOn.getMonth() === new Date().getMonth()
+      && hourClickedOn.getYear() === new Date().getYear()
+    ) {
+    var hourFormat = 'h:00a';
+    var hour = document.getElementById('' + dateFns.format(new Date(), hourFormat) + ' ' + new Date().getMonth() + '/' + new Date().getDate() + '/' + new Date().getYear());
+    //var hour = document.getElementById("4:00pm 1/25/119")
+     if(hour){
+        var prevHour = document.getElementsByClassName('hourRowBlue');
+        var prevHourArr = Array.from(prevHour);
+        prevHourArr[0].classList.remove('hourRowBlue');
+        prevHourArr[0].classList.add('hourRow');
+
+      hour.classList.add('hourRowBlue');
+      hour.classList.remove('hourRow');
+      }
+     }
+    }
+
   render() {
+    let hourClickedOn = this.props.day
+    setInterval(() => this.reNew(hourClickedOn), 10000);
+
     let year = gematriya(hebrewDate(this.props.day.getFullYear(), this.props.day.getMonth() + 1, this.props.day.getDate()).year);
     let month = hebrewDate(this.props.day.getFullYear(), this.props.day.getMonth() + 1, this.props.day.getDate()).month_name;
     let day = gematriya(hebrewDate(this.props.day.getFullYear(), this.props.day.getMonth() + 1, this.props.day.getDate()).date).replace("'", "");
     return  (
-      <div>
+      <div className='paddingBottom'>
         <h1 className='today'>{dateFns.format(this.props.day, monthDayYear)} - {day} {month} {year}</h1>
         <h2>{this.state.loading && <span className='loading'>Loading Notes <Loading /></span>}</h2>
         {this.hours()}
@@ -175,5 +201,3 @@ export default class Day extends Component {
     )
   }
 }
-//<CurrentHour />
-//className='hourRowBlue'

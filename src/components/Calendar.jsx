@@ -100,6 +100,7 @@ export default class Calendar extends Component {
               }`}
               key={day}
               to={`/Day`}
+              id={'' + day.getMonth() + '/' + day.getDate() + '/' + day.getYear()}
               >
               <div
                 onClick={() => this.handleOnClick(cloneDay)}
@@ -154,11 +155,24 @@ export default class Calendar extends Component {
     })
   }
 
+  reNew = (formating, day) => {
+    if (window.document.location.href === 'http://localhost:3000/' || window.document.location.href === 'http://localhost:3000/Calendar'){
+    var dayParent = document.getElementById('' + new Date().getMonth() + '/' + new Date().getDate() + '/' + new Date().getYear()).getElementsByClassName('link');
+      var dayArray = Array.from(dayParent);
+
+      var prevDay = document.getElementById('' + new Date().getMonth() + '/' + (new Date().getDate() - 1) + '/' + new Date().getYear()).getElementsByClassName('link');
+
+       var prevDayArr = Array.from(prevDay);
+        prevDayArr[0].classList.remove('highlightedDate')
+
+       dayArray[0].classList.add('highlightedDate')
+    }
+  }
+
   render(){
-    let formating = 'MM/DD/YYYY'
-    console.log(dateFns.format(new Date(), formating) === dateFns.format(this.state.currentMonth, formating));
-    console.log(new Date().getDate());
-    console.log(dateFns.format(this.state.currentMonth, formating));
+
+  setInterval(this.reNew, 5000);
+
     return (
      <div>
       <Switch>
