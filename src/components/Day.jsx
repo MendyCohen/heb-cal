@@ -15,57 +15,45 @@ class Day extends Component {
 
   constructor(props) {
     super(props)
-    let dayHour = 'h:mma'
-    let currentHour = this.props.day;
-    let startDate = currentHour.setHours(0,0,0,0)
-    let hours = {}
-    let hour = []
-    for(var i = 0; i < 24; i++){
-      hours[dateFns.format(dateFns.addHours(startDate, i), dayHour)] = { notes: []}
-      hour.push(dateFns.format(dateFns.addHours(startDate, i), dayHour))
-    }
     this.state = {
-      hours,
+      hours: this.daySkeleton(),
       loading: true,
       loggedIn: false
     }
-    this.hour = hour
+    this.hour = ["12:00am", "1:00am", "2:00am", "3:00am", "4:00am", "5:00am", "6:00am", "7:00am", "8:00am", "9:00am", "10:00am", "11:00am", "12:00pm", "1:00pm", "2:00pm", "3:00pm", "4:00pm", "5:00pm", "6:00pm", "7:00pm", "8:00pm", "9:00pm", "10:00pm", "11:00pm"]
   }
 
-  // static getDerivedStateFromProps(props, state){
-  //   if (props.globalState.loggedIn !== state.loggedIn){
-  //     return {loggedIn: props.globalState.loggedIn}
-  //   }
-  //   return null
-  // }
+  daySkeleton = () => {
+    let dayHour = 'h:mma'
+    let currentHour = this.props.day;
+    let startDate = currentHour.setHours(0,0,0,0)
+    let dayEvents = {}
+    for(var i = 0; i < 24; i++){
+      let date = dateFns.format(dateFns.addHours(startDate, i), dayHour)
+      dayEvents[date] = { notes: []}
+    }
+    return dayEvents
+  }
 
   componentDidUpdate(prevProps) {
      console.log("update in day")
       if(this.props.globalState.loggedIn !== prevProps.globalState.loggedIn){
         if (this.props.globalState.loggedIn){
         console.log("updating")
-        let dayHour = 'h:mma'
-        let currentHour = this.props.day;
-        let startDate = currentHour.setHours(0,0,0,0)
-        let hours = {}
-        let hour = []
-        for(var i = 0; i < 24; i++){
-          hours[dateFns.format(dateFns.addHours(startDate, i), dayHour)] = { notes: []}
-          hour.push(dateFns.format(dateFns.addHours(startDate, i), dayHour))
-        }
         fetch(`http://localhost:3001/api/v1/events/${dateFns.format(this.props.day, 'D, M, YYYY')}`, {
           headers: {Authorization: localStorage.token, 'Content-Type': 'application/json'}
         })
         .then(res => res.json())
         .then(data => {
           console.log(data)
+           let newDayEvents = this.daySkeleton()
             data.forEach(note => {
             if (note.hour) {
-              hours[note.hour].notes.push(note)
+              newDayEvents[note.hour].notes.push(note)
             }
           })
           this.setState({
-             hours,
+             hours: newDayEvents,
              loading: false,
              loggedIn: true
            })
@@ -73,7 +61,7 @@ class Day extends Component {
        }
        else {
          this.setState({
-           hours: []
+           hours: this.daySkeleton()
          })
        }
      }
@@ -218,6 +206,7 @@ class Day extends Component {
     }
 
   render() {
+    console.log(this.daySkeleton())
     let hourClickedOn = this.props.day
     setInterval(() => this.reNew(hourClickedOn), 10000);
 
