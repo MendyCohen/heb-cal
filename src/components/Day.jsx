@@ -27,24 +27,38 @@ class Day extends Component {
     this.state = {
       hours,
       loading: true,
-      loadOnce: true
+      loggedIn: false
     }
     this.hour = hour
   }
 
-  componentDidUpdate() {
-      console.log('before if statemeant', this.props.globalState);
-      if(this.props.globalState.loggedIn && this.props.globalState.runOnce){
-        console.log(this.props.globalState.loggedIn);
-        console.log(this.props.globalState.runOnce);
-        console.log('after');
-        let hours = { ...this.state.hours }
+  // static getDerivedStateFromProps(props, state){
+  //   if (props.globalState.loggedIn !== state.loggedIn){
+  //     return {loggedIn: props.globalState.loggedIn}
+  //   }
+  //   return null
+  // }
+
+  componentDidUpdate(prevProps) {
+     console.log("update in day")
+      if(this.props.globalState.loggedIn !== prevProps.globalState.loggedIn){
+        if (this.props.globalState.loggedIn){
+        console.log("updating")
+        let dayHour = 'h:mma'
+        let currentHour = this.props.day;
+        let startDate = currentHour.setHours(0,0,0,0)
+        let hours = {}
+        let hour = []
+        for(var i = 0; i < 24; i++){
+          hours[dateFns.format(dateFns.addHours(startDate, i), dayHour)] = { notes: []}
+          hour.push(dateFns.format(dateFns.addHours(startDate, i), dayHour))
+        }
         fetch(`http://localhost:3001/api/v1/events/${dateFns.format(this.props.day, 'D, M, YYYY')}`, {
           headers: {Authorization: localStorage.token, 'Content-Type': 'application/json'}
         })
         .then(res => res.json())
         .then(data => {
-          console.log(data);
+          console.log(data)
             data.forEach(note => {
             if (note.hour) {
               hours[note.hour].notes.push(note)
@@ -52,29 +66,18 @@ class Day extends Component {
           })
           this.setState({
              hours,
-             loading: false
-           })
-         }, this.props.setGlobalState({ runOnce: false }), console.log('rejection', this.props.globalState.runOnce))
-      } else {
-        console.log('before turning the loading components false', this.state.loadOnce);
-        if(this.state.loadOnce){
-          this.setState({
              loading: false,
-             loadOnce: false
+             loggedIn: true
            })
-           console.log('after turning the loading components false', this.state.loadOnce);
-        }
-        // if(!this.props.globalState.loggedIn) {
-        //   console.log('before setting');
-        //   this.setState({})
-        //   console.log('after setting');
-        //   // this.hour.map(hour => {
-        //   //   this.state.hours[hour].notes.map(entireNote => entireNote = null);
-        //   // });
-        // }
+         })
+       }
+       else {
+         this.setState({
+           hours: []
+         })
+       }
+     }
       }
-      // this.setState({ loading: false })
-    }
 
     handleInput = (obj, THIS) => {
         fetch('http://localhost:3001/api/v1/events', {
@@ -215,7 +218,6 @@ class Day extends Component {
     }
 
   render() {
-    console.log('Day render');
     let hourClickedOn = this.props.day
     setInterval(() => this.reNew(hourClickedOn), 10000);
 

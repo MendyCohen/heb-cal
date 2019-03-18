@@ -30,12 +30,12 @@ class App extends Component {
   }
 
   logOut = () => {
-    console.log('logout function');
     this.props.setGlobalState({loggedIn: false})
     localStorage.token = null
   }
 
   login = (e, loginState) => {
+    console.log(loginState)
     e.preventDefault()
     fetch(`http://localhost:3001/api/v1/users/login`, {
       method: 'POST',
@@ -43,21 +43,16 @@ class App extends Component {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({
-        email: loginState.email,
-        password: loginState.password
-      })
+      body: JSON.stringify(loginState)
     })
     .then(res => res.json())
     .then(data => {
       localStorage.token = data.auth_token
-    }, this.props.setGlobalState({
-      loggedIn: true
-    }))
+      this.props.setGlobalState({ loggedIn: true })
+    })
   }
 
   render() {
-    console.log('App render');
     return (
       <div className="App">
         <header>
@@ -68,7 +63,7 @@ class App extends Component {
             </span>
           </div>
           {!this.props.globalState.loggedIn ?
-          <Login login={this.login} loggedIn={this.props.globalState.loggedIn}/> : <button onClick={this.logOut}>{console.log('onclick logout')}Log Out</button>
+          <Login login={this.login} loggedIn={this.props.globalState.loggedIn}/> : <button onClick={this.logOut}>Log Out</button>
           }
         </header>
         <main>
