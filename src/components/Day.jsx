@@ -67,6 +67,34 @@ class Day extends Component {
      }
       }
 
+componentDidMount() {
+    if (this.props.globalState.loggedIn){
+      fetch(`http://localhost:3001/api/v1/events/${dateFns.format(this.props.day, 'D, M, YYYY')}`, {
+        headers: {Authorization: localStorage.token, 'Content-Type': 'application/json'}
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data)
+         let newDayEvents = this.daySkeleton()
+          data.forEach(note => {
+          if (note.hour) {
+            newDayEvents[note.hour].notes.push(note)
+          }
+        })
+        this.setState({
+           hours: newDayEvents,
+           loading: false,
+           loggedIn: true
+         })
+       })
+     }
+     else {
+       this.setState({
+         loading: false
+       })
+     }
+     }
+
     handleInput = (obj, THIS) => {
         fetch('http://localhost:3001/api/v1/events', {
           method: 'POST',
