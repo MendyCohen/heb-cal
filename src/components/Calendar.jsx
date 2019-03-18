@@ -157,27 +157,30 @@ export default class Calendar extends Component {
 
   reNew = (formating, day) => {
     if (window.document.location.href === 'http://localhost:3000/' || window.document.location.href === 'http://localhost:3000/Calendar'){
-    var dayParent = document.getElementById('' + new Date().getMonth() + '/' + new Date().getDate() + '/' + new Date().getYear()).getElementsByClassName('link');
-      var dayArray = Array.from(dayParent);
+      var dayParent = document.getElementById('' + new Date().getMonth() + '/' + new Date().getDate() + '/' + new Date().getYear())
+      if(dayParent){
+        var dayChild = dayParent.getElementsByClassName('link');
+        var dayArray = Array.from(dayChild);
 
-      var prevDay = document.getElementById('' + new Date().getMonth() + '/' + (new Date().getDate() - 1) + '/' + new Date().getYear()).getElementsByClassName('link');
-
-       var prevDayArr = Array.from(prevDay);
-        prevDayArr[0].classList.remove('highlightedDate')
-
-       dayArray[0].classList.add('highlightedDate')
+        var prevDay = document.getElementById('' + new Date().getMonth() + '/' + (new Date().getDate() - 1) + '/' + new Date().getYear())
+        if(prevDay){
+          var prevDayClass = prevDay.getElementsByClassName('link');
+          var prevDayArr = Array.from(prevDayClass);
+          prevDayArr[0].classList.remove('highlightedDate');
+        }
+         dayArray[0].classList.add('highlightedDate')
+      }
     }
   }
 
   render(){
-
   setInterval(this.reNew, 5000);
 
     return (
      <div>
       <Switch>
         <Route exact path='/Day' render={() => {
-          return <Day day={this.state.currentDay}/>
+          return <Day day={this.state.currentDay} />
           }
         }/>
       <Route exact path='Calendar' Component={Calendar}/>

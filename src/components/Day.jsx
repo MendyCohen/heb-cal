@@ -3,14 +3,15 @@ import dateFns from 'date-fns';
 import Note from './Note';
 import Body from './Body';
 import Loading from './Loading.jsx';
-//import CurrentHour from './CurrentHour';
+import { withGlobalState } from 'react-globally';
 
 const hebrewDate = require("hebrew-date");
 const gematriya = require('gematriya');
 
 let monthDayYear = 'dddd MMMM Do YYYY';
 
-export default class Day extends Component {
+class Day extends Component {
+//export default class connect(mapStateToProps)(Day) extends Component {
 
   constructor(props) {
     super(props)
@@ -25,33 +26,61 @@ export default class Day extends Component {
     }
     this.state = {
       hours,
-      loading: true
+      loading: true,
+      loadOnce: true
     }
-
     this.hour = hour
   }
 
-    componentDidMount() {
-      let hours = { ...this.state.hours }
-      fetch(`http://localhost:3001/api/v1/events/${dateFns.format(this.props.day, 'D, M, YYYY')}`)
-      .then(res => res.json())
-      .then(data => {
-          data.forEach(note => {
-          if (note.hour) {
-            hours[note.hour].notes.push(note)
-          }
+  componentDidUpdate() {
+      console.log('before if statemeant', this.props.globalState);
+      if(this.props.globalState.loggedIn && this.props.globalState.runOnce){
+        console.log(this.props.globalState.loggedIn);
+        console.log(this.props.globalState.runOnce);
+        console.log('after');
+        let hours = { ...this.state.hours }
+        fetch(`http://localhost:3001/api/v1/events/${dateFns.format(this.props.day, 'D, M, YYYY')}`, {
+          headers: {Authorization: localStorage.token, 'Content-Type': 'application/json'}
         })
-        this.setState({
-           hours,
-           loading: false
-         })
-      })
+        .then(res => res.json())
+        .then(data => {
+          console.log(data);
+            data.forEach(note => {
+            if (note.hour) {
+              hours[note.hour].notes.push(note)
+            }
+          })
+          this.setState({
+             hours,
+             loading: false
+           })
+         }, this.props.setGlobalState({ runOnce: false }), console.log('rejection', this.props.globalState.runOnce))
+      } else {
+        console.log('before turning the loading components false', this.state.loadOnce);
+        if(this.state.loadOnce){
+          this.setState({
+             loading: false,
+             loadOnce: false
+           })
+           console.log('after turning the loading components false', this.state.loadOnce);
+        }
+        // if(!this.props.globalState.loggedIn) {
+        //   console.log('before setting');
+        //   this.setState({})
+        //   console.log('after setting');
+        //   // this.hour.map(hour => {
+        //   //   this.state.hours[hour].notes.map(entireNote => entireNote = null);
+        //   // });
+        // }
+      }
+      // this.setState({ loading: false })
     }
 
     handleInput = (obj, THIS) => {
         fetch('http://localhost:3001/api/v1/events', {
           method: 'POST',
           headers: {
+            Authorization: localStorage.token,
             'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
@@ -59,8 +88,7 @@ export default class Day extends Component {
             title: obj.title,
             note: obj.note,
             hour: obj.hour,
-            day: this.props.day,
-            user_id: 2
+            day: this.props.day
           })
         })
         .then(res => res.json())
@@ -81,6 +109,7 @@ export default class Day extends Component {
         fetch(`http://localhost:3001/api/v1/events/${id}`, {
           method: 'PATCH',
           headers: {
+            Authorization: localStorage.token,
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
@@ -186,6 +215,7 @@ export default class Day extends Component {
     }
 
   render() {
+    console.log('Day render');
     let hourClickedOn = this.props.day
     setInterval(() => this.reNew(hourClickedOn), 10000);
 
@@ -201,3 +231,12 @@ export default class Day extends Component {
     )
   }
 }
+
+// const mapStateToProps = (reduxState) => {
+//   console.log(reduxState);
+//   return reduxState
+// }
+
+ //export default Day
+export default withGlobalState(Day)
+//export default connect(mapStateToProps)(Day)
