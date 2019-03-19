@@ -42,7 +42,7 @@ class Note extends Component {
           onClose={this.close}
           trigger={
             <Icon
-              onClick={this.props.globalState.loggedIn ? this.show(true): () => alert("Please log in in.")}
+              onClick={this.props.globalState.loggedIn ? this.show(true): () => alert("Please log in.")}
               size='small'
               name='edit'
               className={this.props.hour.length === 6 ? 'iconExtraPadding' : 'icon'}
