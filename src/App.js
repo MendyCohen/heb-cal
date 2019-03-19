@@ -23,7 +23,8 @@ class App extends Component {
      if (!data.error){
        this.props.setGlobalState({
          loggedIn: true,
-         user: data
+         user: data,
+         openLogin: false
        })
      }
    })

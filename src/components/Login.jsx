@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Button, Header, Icon, Modal, Form, Segment } from 'semantic-ui-react'
+import { withGlobalState } from 'react-globally';
 
-export default class Login extends Component {
+class Login extends Component {
 
   state = {
     email: '',
@@ -32,12 +33,7 @@ export default class Login extends Component {
     return(
       <div>
         <Modal className='HeaderButton' trigger={<Button>Log In</Button>} closeIcon>
-          <Header icon='archive' content='Archive Old Messages' />
           <Modal.Content>
-            <p>
-              Your inbox is getting full, would you like us to enable automatic archiving of old messages?
-            </p>
-
             <form onSubmit={(e) => this.props.login(e, this.state)} >
               <label>
                 Email:
@@ -65,15 +61,10 @@ export default class Login extends Component {
               <br></br>
               <button type='submit'>Login</button>
             </form>
-
           </Modal.Content>
-          <Modal.Actions>
-            <Button color='green'>
-               Submit
-            </Button>
-          </Modal.Actions>
         </Modal>
       </div>
     )
   }
 }
+export default withGlobalState(Login)
