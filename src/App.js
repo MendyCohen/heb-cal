@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import './App.css';
 import Calendar from './components/Calendar.jsx';
 import Login from './components/Login';
-import {connect} from 'react-redux';
+//import {connect} from 'react-redux';
 import { withGlobalState } from 'react-globally';
-import Day from './components/Day.jsx'
+//import Day from './components/Day.jsx'
 
 class App extends Component {
 

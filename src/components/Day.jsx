@@ -18,7 +18,8 @@ class Day extends Component {
     this.state = {
       hours: this.daySkeleton(),
       loading: true,
-      loggedIn: false
+      loggedIn: false,
+      controllingTheUpdate: true
     }
     this.hour = ["12:00am", "1:00am", "2:00am", "3:00am", "4:00am", "5:00am", "6:00am", "7:00am", "8:00am", "9:00am", "10:00am", "11:00am", "12:00pm", "1:00pm", "2:00pm", "3:00pm", "4:00pm", "5:00pm", "6:00pm", "7:00pm", "8:00pm", "9:00pm", "10:00pm", "11:00pm"]
   }
@@ -34,12 +35,14 @@ class Day extends Component {
     }
     return dayEvents
   }
-
+// If I flip everything I might have the loading component run from render till I quit it on line 43
+// Map it out before jumping into anything
   componentDidUpdate(prevProps) {
-     console.log("update in day")
       if(this.props.globalState.loggedIn !== prevProps.globalState.loggedIn){
         if (this.props.globalState.loggedIn){
-        console.log("updating")
+          this.setState({
+            loading: true
+          })
         fetch(`http://localhost:3001/api/v1/events/${dateFns.format(this.props.day, 'D, M, YYYY')}`, {
           headers: {Authorization: localStorage.token, 'Content-Type': 'application/json'}
         })
@@ -58,17 +61,22 @@ class Day extends Component {
              loggedIn: true
            })
          })
-       }
-       else {
-         this.setState({
-           hours: this.daySkeleton()
-         })
-       }
-     }
+       } else {
+          if(this.state.loggedIn){
+            this.setState({
+              hours: this.daySkeleton(),
+              loading: false
+            })
+          }
+        }
       }
+    }
 
 componentDidMount() {
     if (this.props.globalState.loggedIn){
+      this.setState({
+        loading: true
+      })
       fetch(`http://localhost:3001/api/v1/events/${dateFns.format(this.props.day, 'D, M, YYYY')}`, {
         headers: {Authorization: localStorage.token, 'Content-Type': 'application/json'}
       })
@@ -87,12 +95,15 @@ componentDidMount() {
            loggedIn: true
          })
        })
-     }
+    }
      else {
-       this.setState({
-         loading: false
-       })
-     }
+        if(!this.state.loggedIn){
+          this.setState({
+            hours: this.daySkeleton(),
+            loading: false
+          })
+        }
+      }
      }
 
     handleInput = (obj, THIS) => {
@@ -234,7 +245,6 @@ componentDidMount() {
     }
 
   render() {
-    console.log(this.daySkeleton())
     let hourClickedOn = this.props.day
     setInterval(() => this.reNew(hourClickedOn), 10000);
 
