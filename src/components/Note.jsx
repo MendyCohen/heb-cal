@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Button, Header, Image, Modal, Icon, Form } from 'semantic-ui-react';
 import { withGlobalState } from 'react-globally';
 import { withRouter } from "react-router-dom"
-import Login from './Login.jsx'
+//import Login from './Login.jsx'
 
 class Note extends Component {
 
@@ -35,14 +35,13 @@ class Note extends Component {
   render() {
     const { open, dimmer } = this.state
     return (
-
         <Modal
           dimmer={dimmer}
           open={open}
           onClose={this.close}
           trigger={
             <Icon
-              onClick={this.props.globalState.loggedIn ? this.show(true): () => alert("Please log in.")}
+              onClick={this.props.globalState.loggedIn ? this.show(true) : () => this.props.setGlobalState({ open: true })}
               size='small'
               name='edit'
               className={this.props.hour.length === 6 ? 'iconExtraPadding' : 'icon'}

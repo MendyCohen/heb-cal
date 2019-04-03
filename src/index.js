@@ -11,7 +11,9 @@ import { Provider } from 'react-globally';
 const initialState = {
   loggedIn: false,
   runOnce: true,
-  user: {}
+  user: {},
+  open: false,
+  currentDay: new Date()
 }
 
 //const store = createStore(reducer)

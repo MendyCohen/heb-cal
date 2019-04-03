@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Header, Icon, Modal, Form, Segment } from 'semantic-ui-react'
 import { withGlobalState } from 'react-globally';
+import Note from './Note.jsx';
 
 class Login extends Component {
 
@@ -9,6 +10,8 @@ class Login extends Component {
     password: '',
     eye: 'eye'
   }
+   close = () => this.props.setGlobalState({open: false})
+
 
   handleChange = (e) => {
     this.setState({
@@ -32,7 +35,15 @@ class Login extends Component {
   render() {
     return(
       <div>
-        <Modal className='HeaderButton' trigger={<Button>Log In</Button>} closeIcon>
+        <Modal
+          open={this.props.globalState.open}
+          onClose={this.close}
+          className='HeaderButton'
+          trigger={
+            <Button onClick={() => this.props.setGlobalState({open: true})}>Log In</Button>
+          }
+          closeIcon
+          >
           <Modal.Content>
             <form onSubmit={(e) => this.props.login(e, this.state)} >
               <label>
@@ -61,6 +72,7 @@ class Login extends Component {
               <br></br>
               <button type='submit'>Login</button>
             </form>
+            <p>If you don't have an account Sign up here</p>
           </Modal.Content>
         </Modal>
       </div>

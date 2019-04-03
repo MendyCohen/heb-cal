@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import dateFns from 'date-fns';
 import Day from './Day.jsx'
 import { Route, Switch, Link } from 'react-router-dom';
+import { withGlobalState } from 'react-globally';
 const hebrewDate = require("hebrew-date");
 const gematriya = require('gematriya');
 // const Hebcal = require('hebcal');
@@ -9,26 +10,19 @@ const gematriya = require('gematriya');
 let yearForState = hebrewDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()).year
 let monthForState = hebrewDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()).month_name
 
-export default class Calendar extends Component {
-
+class Calendar extends Component {
 
   state = {
     currentMonth: new Date(),
     selectedDate: new Date(),
     currentHebMonth: monthForState,
-    currentHebYear: yearForState,
-    currentDay: new Date()
+    currentHebYear: yearForState
   };
 
-  // todayHighlight = () => {
-  //   {new Date() ? }
-  // }
 
   handleOnClick = (cloneDay) => {
     this.onDateClick(dateFns.parse(cloneDay))
-    this.setState({
-      currentDay: cloneDay
-    })
+    this.props.setGlobalState({ currentDay: cloneDay })
   }
 
   renderHeader() {
@@ -175,23 +169,16 @@ export default class Calendar extends Component {
 
   render(){
   setInterval(this.reNew, 5000);
-
     return (
      <div>
-      <Switch>
-        <Route exact path='/Day' render={() => {
-          return <Day day={this.state.currentDay} />
-          }
-        }/>
-      <Route exact path='Calendar' Component={Calendar}/>
           <div className='calendar'>
             {this.renderHeader()}
             {this.renderDays()}
             {this.renderCells()}
           </div>
-      </Switch>
      </div>
     )
   }
 }
+export default withGlobalState(Calendar)
 // currentHebMonth: new Hebcal.HDate().toString('h')

@@ -43,11 +43,12 @@ class Day extends Component {
           this.setState({
             loading: true
           })
-        fetch(`http://localhost:3001/api/v1/events/${dateFns.format(this.props.day, 'D, M, YYYY')}`, {
-          headers: {Authorization: localStorage.token, 'Content-Type': 'application/json'}
-        })
-        .then(res => res.json())
-        .then(data => {
+          fetch(`http://localhost:3001/api/v1/events/${dateFns.format(this.props.day, 'D, M, YYYY')}`, {
+            headers: {Authorization: localStorage.token, 'Content-Type': 'application/json'}
+          })
+          .then(res => res.json())
+          .then(data => {
+
           console.log(data)
            let newDayEvents = this.daySkeleton()
             data.forEach(note => {
@@ -194,6 +195,7 @@ componentDidMount() {
       })
      }
 
+
   hours = () => {
     //Hours is defined above as a global scope
     let hourFormat = 'h:00a'
@@ -261,11 +263,4 @@ componentDidMount() {
   }
 }
 
-// const mapStateToProps = (reduxState) => {
-//   console.log(reduxState);
-//   return reduxState
-// }
-
- //export default Day
 export default withGlobalState(Day)
-//export default connect(mapStateToProps)(Day)
