@@ -27,6 +27,10 @@ class Signup extends Component {
         <input placeholder='Last Name' />
       </Form.Field>
       <Form.Field>
+        <label>City</label>
+        <input placeholder='Address' />
+      </Form.Field>
+      <Form.Field>
         <label>Email Address</label>
         <input placeholder='Email Address' />
       </Form.Field>
